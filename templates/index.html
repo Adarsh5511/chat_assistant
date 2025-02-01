@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fb;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .chat-container {
+            width: 500px;
+            max-width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 18px;
+        }
+        .chat-box {
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-box p {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            word-wrap: break-word;
+        }
+        .user-msg {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-start;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        .assistant-msg {
+            background-color: #f0f0f0;
+            color: #333;
+            align-self: flex-end;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        .input-container {
+            padding: 15px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #ddd;
+        }
+        .input-container input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .input-container input:focus {
+            border-color: #007bff;
+        }
+        .input-container button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+        .input-container button:active {
+            background-color: #003c8f;
+        }
+        .footer {
+            padding: 10px;
+            background-color: #f1f1f1;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Virtual Assistant
+        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Ask me something...">
+            <button onclick="sendQuery()">Send</button>
+        </div>
+        <div class="footer">
+            Chat Assistant 
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+
+        function sendQuery() {
+            const query = userInput.value.trim();
+            if (!query) return;
+
+
+            chatBox.innerHTML += `<p class="user-msg"><strong>You:</strong> ${query}</p>`;
+            userInput.value = '';
+
+            
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+              
+                chatBox.innerHTML += `<p class="assistant-msg"><strong>Assistant:</strong> ${data.response}</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight; 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+       
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendQuery();
+            }
+        });
+    </script>
+</body>
+</html>
